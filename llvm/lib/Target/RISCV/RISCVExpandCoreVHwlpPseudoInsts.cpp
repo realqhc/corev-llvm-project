@@ -124,6 +124,13 @@ bool RISCVExpandCoreVHwlpPseudo::ProcessLoop(MachineLoop *ML,
       LastInstr = MI;
       EndOffset = Offset;
     }
+    unsigned Size = TII->getInstSizeInBytes(*MI);
+    // Instruction compression is disabled here
+    if (Size == 2){
+        Size = 4;
+    }
+    Offset += Size;
+
     // Find the end of an inner hardware loop
     switch (MI->getOpcode()) {
       case RISCV::CV_SETUP:
@@ -139,12 +146,6 @@ bool RISCVExpandCoreVHwlpPseudo::ProcessLoop(MachineLoop *ML,
     if (InnerEndSymbol && InnerEndSymbol == MI->getPreInstrSymbol()) {
       InnerHwlpEndOffset = Offset;
     }
-    unsigned Size = TII->getInstSizeInBytes(*MI);
-    // Instruction compression is disabled here
-    if (Size == 2){
-      Size = 4;
-    }
-    Offset += Size;
 
     MachineInstr *Next = MI->getNextNode();
     if (!Next) {
