@@ -155,6 +155,17 @@ define i32 @test.cv.cnt(i32 %a) {
   ret i32 %1
 }
 
+declare i32 @llvm.ctpop.i32(i32)
+
+define i32 @ctpop_i32(i32 %a) {
+; CHECK-LABEL: ctpop_i32:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    cv.cnt a0, a0
+; CHECK-NEXT:    ret
+  %1 = call i32 @llvm.ctpop.i32(i32 %a)
+  ret i32 %1
+}
+
 declare i32 @llvm.fshr.i32(i32, i32, i32)
 
 define i32 @test.cv.ror(i32 %a, i32 %b) {
