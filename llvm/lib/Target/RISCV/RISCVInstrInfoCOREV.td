@@ -1005,6 +1005,21 @@ let Predicates = [HasExtXcvmem, IsRV32] in {
 // Patterns for SIMD operations
 //===----------------------------------------------------------------------===//
 
+class PatCoreVBitConvert<ValueType DstVT, ValueType SrcVT,
+                       RegisterClass DstRC, RegisterClass SrcRC>
+    : Pat<(DstVT (bitconvert (SrcVT SrcRC:$src))),
+          (COPY_TO_REGCLASS SrcRC:$src, DstRC)>;
+
+let Predicates = [HasExtXcvsimd, IsRV32] in {
+def : PatCoreVBitConvert<XLenVT,   XVEI8VT,  GPR, GPR>;
+def : PatCoreVBitConvert<XLenVT,   XVEI16VT, GPR, GPR>;
+def : PatCoreVBitConvert<XVEI8VT,  XLenVT,   GPR, GPR>;
+def : PatCoreVBitConvert<XVEI16VT, XLenVT,   GPR, GPR>;
+
+def : PatCoreVBitConvert<XVEI8VT,  XVEI16VT, GPR, GPR>;
+def : PatCoreVBitConvert<XVEI16VT, XVEI8VT,  GPR, GPR>;
+} // Predicates = [HasExtXcvsimd, IsRV32]
+
 class PatCorevGprGpr <string intr, string asm> :
   PatGprGpr<!cast<Intrinsic>("int_riscv_cv_simd_" # intr),
             !cast<RVInst>("CV_" # asm)>;
@@ -1197,7 +1212,13 @@ let Predicates = [HasExtXcvsimd, IsRV32] in {
 
   defm ADD : PatCorevGprGprDivAll<int_riscv_cv_simd_add_h>;
   defm SUB : PatCorevGprGprDivAll<int_riscv_cv_simd_sub_h>;
+
+def: Pat<(v4i8 (add v4i8:$Rs, v4i8:$Rt)), (CV_ADD_B XVEI8VT:$Rs, XVEI8VT:$Rt)>;
 }
+
+//===----------------------------------------------------------------------===//
+// Patterns for BitManip operations
+//===----------------------------------------------------------------------===//
 
 multiclass PatCoreVBitManip <Intrinsic intr> {
   def "CV_" # NAME # "_PSEUDO" : Pseudo<(outs GPR:$rd), (ins GPR:$rs1, cv_uimm10:$imm), []>;
@@ -1227,6 +1248,10 @@ let Predicates = [HasExtXcvbitmanip, IsRV32] in {
   def : Pat<(int_riscv_cv_bitmanip_bitrev GPR:$rs1, cv_tuimm5:$pts, cv_tuimm2:$radix),
             (CV_BITREV GPR:$rs1, cv_tuimm2:$radix, cv_tuimm5:$pts)>;
 }
+
+//===----------------------------------------------------------------------===//
+// Patterns for Elw operations
+//===----------------------------------------------------------------------===//
 
 let Predicates = [HasExtXcvelw, IsRV32] in {
   def : Pat<(int_riscv_cv_elw_elw GPR:$rs1), (PseudoCV_ELW GPR:$rs1)>;
