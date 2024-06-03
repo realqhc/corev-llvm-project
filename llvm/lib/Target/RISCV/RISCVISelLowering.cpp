@@ -433,7 +433,7 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
   }
 
   if (Subtarget.hasExtXcvbitmanip()) {
-    setOperationAction({ISD::CTPOP}, XLenVT, Legal);
+    setOperationAction(ISD::CTPOP, XLenVT, Legal);
   }
 
   if (Subtarget.hasExtXcvmem()) {
