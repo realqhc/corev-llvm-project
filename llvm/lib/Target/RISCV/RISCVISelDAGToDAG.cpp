@@ -729,11 +729,11 @@ bool RISCVDAGToDAGISel::tryXCVbitmanipExtractOp(SDNode *N, bool IsSigned) {
         // targetShrinkDemandedConstant chooses a different immediate.
         AndImm &= -1U >> Srl_imm;
 
-        unsigned Width = countTrailingOnes(AndImm);
+        // Note: The width operand is encoded as width-1.
+        unsigned Width = countTrailingOnes(AndImm) - 1;
         unsigned LSB = Srl_imm;
 
-
-        if ((LSB + Width) == N->getValueType(0).getSizeInBits()) {
+        if ((LSB + Width + 1) == N->getValueType(0).getSizeInBits()) {
           Opc = IsSigned ? RISCV::SRA : RISCV::SRL;
           SDNode *NewNode = CurDAG->getMachineNode(
             Opc, DL, VT, N->getOperand(0).getOperand(0));
@@ -760,11 +760,11 @@ bool RISCVDAGToDAGISel::tryXCVbitmanipExtractOp(SDNode *N, bool IsSigned) {
     unsigned Srl_imm = 0;
     if (isInt32Immediate(N->getOperand(1), Srl_imm)) {
       assert(Srl_imm > 0 && Srl_imm < 32 && "bad amount in shift node!");
-      unsigned Width = 32 - Srl_imm;
+      unsigned Width = 32 - Srl_imm - 1;
       int LSB = Srl_imm - Shl_imm;
       if (LSB < 0)
         return false;
-      assert(LSB + Width <= 32 && "cv.extract width will get shrank");
+      assert(LSB + Width + 1 <= 32 && "cv.extract width will get shrank");
       SDNode *NewNode = CurDAG->getMachineNode(
         Opc, DL, VT, N->getOperand(0).getOperand(0),
         CurDAG->getTargetConstant(Width, DL, XLenVT),
@@ -784,11 +784,11 @@ bool RISCVDAGToDAGISel::tryXCVbitmanipExtractOp(SDNode *N, bool IsSigned) {
       assert(Srl_imm > 0 && Srl_imm < 32 && "bad amount in shift node!");
       unsigned MSB = 31 - countLeadingZeros(AndImm);
       unsigned Width = MSB - LSB;
-      assert(Srl_imm + Width <= 32 && "cv.extract width will get shrank");
+      assert(Srl_imm + Width + 1 <= 32 && "cv.extract width will get shrank");
       SDNode *NewNode = CurDAG->getMachineNode(
         Opc, DL, VT, N->getOperand(0).getOperand(0),
         CurDAG->getTargetConstant(Width, DL, XLenVT),
-        CurDAG->getTargetConstant(LSB, DL, XLenVT));
+          CurDAG->getTargetConstant(Srl_imm, DL, XLenVT));
       ReplaceNode(N, NewNode);
       return true;
     }

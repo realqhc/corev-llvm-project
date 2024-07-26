@@ -191,7 +191,7 @@ define i32 @test.cv.bitrev(i32 %a) {
 define i32 @sbfx1(i32 %a) {
 ; CHECK-LABEL: sbfx1:
 ; CHECK:       # %bb.0:
-; CHECK-NEXT:    cv.extract a0, a0, 11, 7
+; CHECK-NEXT:    cv.extract a0, a0, 10, 7
 ; CHECK-NEXT:    ret
 	%t1 = lshr i32 %a, 7
 	%t2 = trunc i32 %t1 to i11
@@ -202,7 +202,7 @@ define i32 @sbfx1(i32 %a) {
 define i32 @ubfx1(i32 %a) {
 ; CHECK-LABEL: ubfx1:
 ; CHECK:       # %bb.0:
-; CHECK-NEXT:    cv.extractu a0, a0, 11, 7
+; CHECK-NEXT:    cv.extractu a0, a0, 10, 7
 ; CHECK-NEXT:    ret
 	%t1 = lshr i32 %a, 7
 	%t2 = trunc i32 %t1 to i11
@@ -213,7 +213,7 @@ define i32 @ubfx1(i32 %a) {
 define i32 @ubfx2(i32 %a) {
 ; CHECK-LABEL: ubfx2:
 ; CHECK:       # %bb.0:
-; CHECK-NEXT:    cv.extractu a0, a0, 11, 7
+; CHECK-NEXT:    cv.extractu a0, a0, 10, 7
 ; CHECK-NEXT:    ret
 	%t1 = lshr i32 %a, 7
 	%t2 = and i32 %t1, 2047
@@ -243,7 +243,7 @@ define i32 @ubfx4(i32 %a) {
 define i32 @f1(i32 %a) {
 ; CHECK-LABEL: f1:
 ; CHECK:       # %bb.0: # %entry
-; CHECK-NEXT:    cv.extract a0, a0, 20, 0
+; CHECK-NEXT:    cv.extract a0, a0, 19, 0
 ; CHECK-NEXT:    ret
 entry:
     %tmp = shl i32 %a, 12
@@ -266,7 +266,7 @@ entry:
 define i32 @f3(i32 %a) {
 ; CHECK-LABEL: f3:
 ; CHECK:       # %bb.0: # %entry
-; CHECK-NEXT:    cv.extract a0, a0, 3, 5
+; CHECK-NEXT:    cv.extract a0, a0, 2, 5
 ; CHECK-NEXT:    ret
 entry:
     %tmp = shl i32 %a, 24
@@ -277,7 +277,7 @@ entry:
 define i32 @f4(i32 %a) {
 ; CHECK-LABEL: f4:
 ; CHECK:       # %bb.0: # %entry
-; CHECK-NEXT:    cv.extractu a0, a0, 3, 5
+; CHECK-NEXT:    cv.extractu a0, a0, 2, 5
 ; CHECK-NEXT:    ret
 entry:
     %tmp = shl i32 %a, 24
@@ -300,7 +300,7 @@ entry:
 define signext i8 @f6(i32 %a) {
 ; CHECK-LABEL: f6:
 ; CHECK:       # %bb.0:
-; CHECK-NEXT:    cv.extract a0, a0, 8, 23
+; CHECK-NEXT:    cv.extract a0, a0, 7, 23
 ; CHECK-NEXT:    ret
 
   %tmp = lshr i32 %a, 23
